@@ -7,4 +7,4 @@
 
 ## Issues  
 * USART2 (PA2 TX, PA3 RX) is OK, but USART1 is not OK (see vendor/stm32f103rct6.pdf)    
-
+* In MDK4 emulator (Debug Session), please open UART2, not UART1  
