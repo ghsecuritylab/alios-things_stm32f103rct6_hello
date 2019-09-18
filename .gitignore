@@ -1,3 +1,9 @@
+/projects/bin/
+/projects/*.a
+*.bak
+*.dep
+JLinkLog.txt
+
 # Prerequisites
 *.d
 
@@ -18,7 +24,7 @@
 
 # Libraries
 *.lib
-*.a
+#*.a
 *.la
 *.lo
 
