@@ -1,0 +1,16 @@
+Ubuntu 16.04, 64bit (MUST BE 64bit)    
+
+$ sudo apt install python-pip
+$ python -m pip install --upgrade pip
+//why???
+$ sudo chown -hR wmt /usr/local/lib/python2.7/
+$ sudo chown -hR wmt /usr/local
+//why???
+$ pip install aos-cube
+$ git clone https://gitee.com/alios-things/kconfig-frontends-linux.git ./build/kconfig/Linux64/
+$ aos make blink@starterkit -c config 
+$ aos make
+$ aos make menuconfig
+$ aos make export-keil
+$ aos make blink@stm32f103rb-nucleo -c config
+$ aos make export-keil
