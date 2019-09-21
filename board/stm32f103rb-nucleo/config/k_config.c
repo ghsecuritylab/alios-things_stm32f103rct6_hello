@@ -96,7 +96,7 @@ size_t soc_get_cur_sp()
 #endif
     return sp;
 }
-static void soc_print_stack()
+/*static*/ void soc_print_stack()
 {
     void    *cur, *end;
     int      i=0;

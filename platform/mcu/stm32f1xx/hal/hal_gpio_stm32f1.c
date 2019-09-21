@@ -20,10 +20,10 @@ typedef  struct gpio_irq_slop {
 } gpio_irq_slop_t;
 
 static gpio_irq_slop_t gGpioSlop[GPIO_IRQ_SLOP_MAX]= {
-    {-1},{-1},{-1},{-1},
-    {-1},{-1},{-1},{-1},
-    {-1},{-1},{-1},{-1},
-    {-1},{-1},{-1},{-1},
+    {/*pin_num=*/-1},{/*pin_num=*/-1},{/*pin_num=*/-1},{/*pin_num=*/-1},
+    {/*pin_num=*/-1},{/*pin_num=*/-1},{/*pin_num=*/-1},{/*pin_num=*/-1},
+    {/*pin_num=*/-1},{/*pin_num=*/-1},{/*pin_num=*/-1},{/*pin_num=*/-1},
+    {/*pin_num=*/-1},{/*pin_num=*/-1},{/*pin_num=*/-1},{/*pin_num=*/-1},
 };
 static int32_t gpio_para_transform(gpio_dev_t *gpio, GPIO_InitTypeDef * init_str);
 static int32_t get_gpio_group(gpio_dev_t *gpio, GPIO_TypeDef **GPIOx);
@@ -35,7 +35,7 @@ static  gpio_irq_slop_t * gpio_slop_get(int32_t pin_num)
 {
 
     int32_t index = -1;
-    int8_t found = 0;
+    /*int8_t found = 0;*/
     for(index=0; index<GPIO_IRQ_SLOP_MAX; ++index) {
         if(pin_num == gGpioSlop[index].pin_num){
             return &gGpioSlop[index];
@@ -49,7 +49,7 @@ static  int8_t  gpio_slop_irq(int32_t irq_num)
 {
 
     int32_t index = -1;
-    int8_t found = 0;
+    /*int8_t found = 0;*/
     for(index=0; index<GPIO_IRQ_SLOP_MAX; ++index) {
         if(irq_num != gGpioSlop[index].irq_num)continue;
         if(NULL == gGpioSlop[index].handler)continue;
@@ -353,7 +353,7 @@ int32_t gpio_has_priv(gpio_dev_t *gpio, GPIO_InitTypeDef * init_str)
 int32_t gpio_para_transform(gpio_dev_t *gpio, GPIO_InitTypeDef * init_str)
 {
     int32_t ret = 0;
-    IRQn_Type pirqn = 0;
+    IRQn_Type pirqn = (IRQn_Type)0;
 
     switch (gpio->config) {
     case ANALOG_MODE:
@@ -459,7 +459,7 @@ int32_t get_gpio_group(gpio_dev_t *gpio, GPIO_TypeDef **GPIOx)
 
 uint32_t get_gpio_pin(uint8_t pin)
 {
-    uint32_t result = 1;
+    /*uint32_t result = 1;*/
     uint8_t pin_t = pin % PINS_IN_GROUP;
 
     return (uint32_t)1<<pin_t;
@@ -521,7 +521,7 @@ int32_t hal_gpio_disable_irq(gpio_dev_t *gpio)
 			return (-1);
     }
 
-		pirqn = 0;
+		pirqn = (IRQn_Type)0;
     slop = gpio_slop_get(gpio->port);
     if(NULL == slop) {
         return(-1);

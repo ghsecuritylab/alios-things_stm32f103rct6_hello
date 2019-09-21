@@ -1,0 +1,62 @@
+!!!note: change to 1 is UART1, change to 2 is UART2!!!------------>
+
+//use UART1 or UART2 as debug serial ?
+#define USART_DEBUG 1
+
+#if USART_DEBUG == 1
+/*use uart1 as debug uart*/
+#define USART_DEBUG_PORT USART1
+#elif USART_DEBUG == 2
+/*use uart2 as debug uart*/
+#define USART_DEBUG_PORT USART2
+#endif
+
+
+
+
+/**
+  * Enable DMA controller clock
+  */
+void MX_DMA_Init(void)
+{
+  /* DMA controller clock enable */
+  __HAL_RCC_DMA1_CLK_ENABLE();
+
+  /* DMA interrupt init */
+	
+  /* DMA1_Channel4_IRQn interrupt configuration */	
+  HAL_NVIC_SetPriority(DMA1_Channel4_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel4_IRQn);
+  /* DMA1_Channel5_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel4_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel4_IRQn);	
+
+  /* DMA1_Channel6_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel6_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel6_IRQn);
+  /* DMA1_Channel7_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel7_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel7_IRQn);
+}
+
+/**
+  * @brief This function handles DMA1 channel4 global interrupt.
+  */
+void DMA1_Channel4_IRQHandler(void)
+{
+  krhino_intrpt_enter();
+!!!note TX!!!------------>  USART_DMA_TX_IRQHandler(USART1);
+  krhino_intrpt_exit();
+}
+
+/**
+  * @brief This function handles DMA1 channel5 global interrupt.
+  */
+void DMA1_Channel5_IRQHandler(void)
+{
+  krhino_intrpt_enter();
+!!!note RX!!!------------>    USART_DMA_RX_IRQHandler(USART1);
+  krhino_intrpt_exit();
+}
+
+

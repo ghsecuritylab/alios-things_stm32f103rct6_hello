@@ -274,7 +274,7 @@ uint32_t vfs_lseek(int32_t fd, uint32_t offset, int32_t whence)
 
     f = vfs_file_get(fd);
     if (f == NULL) {
-        return VFS_ERR_NOENT;
+        return (uint32_t)VFS_ERR_NOENT;
     }
 
     node = f->node;

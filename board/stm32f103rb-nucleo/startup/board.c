@@ -18,12 +18,18 @@
 
 #include "aos/hal/uart.h"
 
-#include "k_config.h"
+//#include "k_config.h"
+#include "k_api.h"
 #include "board.h"
 
 #include "stm32f1xx_hal.h"
 #include "hal_uart_stm32f1.h"
 
+extern void aos_heap_set(void);
+extern void flash_partition_init(void);
+extern void USART_DMA_RX_IRQHandler(const void* uartIns);
+extern void USART_DMA_TX_IRQHandler(const void* uartIns);
+	
 #if defined (__CC_ARM) && defined(__MICROLIB)
 #define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
 #define GETCHAR_PROTOTYPE int fgetc(FILE *f)
@@ -41,12 +47,25 @@ size_t g_iram1_total_size = 0x00005000;
 
 void stm32_soc_peripheral_init(void);
 
+//use UART1 or UART2 as debug serial ?
+#define USART_DEBUG 1
+
+#if USART_DEBUG == 1
+/*use uart1 as debug uart*/
+#define USART_DEBUG_PORT USART1
+#elif USART_DEBUG == 2
+/*use uart2 as debug uart*/
+#define USART_DEBUG_PORT USART2
+#endif
+
 uart_dev_t uart_0;
+DMA_HandleTypeDef hdma_usart1_tx;
+DMA_HandleTypeDef hdma_usart1_rx;
 DMA_HandleTypeDef hdma_usart2_tx;
 DMA_HandleTypeDef hdma_usart2_rx;
 UART_MAPPING UART_MAPPING_TABLE[] =
 {
-  {PORT_UART_STD, USART2, {UART_OVERSAMPLING_16, 64}} //FIXME:USART2->USART1
+  {PORT_UART_STD, USART_DEBUG_PORT, {UART_OVERSAMPLING_16, 64}} //FIXME:USART2->USART1
 };
 
 static void stduart_init(void)
@@ -141,13 +160,40 @@ void MX_DMA_Init(void)
   __HAL_RCC_DMA1_CLK_ENABLE();
 
   /* DMA interrupt init */
+	
+  /* DMA1_Channel4_IRQn interrupt configuration */	
+  HAL_NVIC_SetPriority(DMA1_Channel4_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel4_IRQn);
+  /* DMA1_Channel5_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel4_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel4_IRQn);	
+
   /* DMA1_Channel6_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(DMA1_Channel6_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(DMA1_Channel6_IRQn);
   /* DMA1_Channel7_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(DMA1_Channel7_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(DMA1_Channel7_IRQn);
+}
 
+/**
+  * @brief This function handles DMA1 channel4 global interrupt.
+  */
+void DMA1_Channel4_IRQHandler(void)
+{
+  krhino_intrpt_enter();
+  USART_DMA_TX_IRQHandler(USART1);
+  krhino_intrpt_exit();
+}
+
+/**
+  * @brief This function handles DMA1 channel5 global interrupt.
+  */
+void DMA1_Channel5_IRQHandler(void)
+{
+  krhino_intrpt_enter();
+  USART_DMA_RX_IRQHandler(USART1);
+  krhino_intrpt_exit();
 }
 
 /**
@@ -230,7 +276,7 @@ GETCHAR_PROTOTYPE
 {
   /* Place your implementation of fgetc here */
   /* e.g. readwrite a character to the USART2 and Loop until the end of transmission */
-  uint8_t ch = EOF;
+  uint8_t ch = (uint8_t)EOF;
   int32_t ret = -1;
   uint32_t recv_size;
 

@@ -135,7 +135,7 @@ int FLASH_write_at(uint32_t address, uint32_t *pData, uint32_t len_bytes)
   */
 int FLASH_read_at(uint32_t address, uint64_t *pData, uint32_t len_bytes)
 {
-    int i;
+    /*int i;*/
     int ret = -1;
     /*Flash reading can be in byte*/
     memcpy((uint8_t *)pData, (uint8_t *)address, len_bytes);

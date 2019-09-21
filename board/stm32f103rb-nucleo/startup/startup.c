@@ -44,7 +44,8 @@ void trace_start(void)
 
 static void sys_init(void)
 {
-    /* user code start*/
+		/* user code start*/
+    extern void stm32_soc_peripheral_init(void);
     stm32_soc_peripheral_init();
     /*insert driver to enable irq for example: starting to run tick time.
      drivers to trigger irq is forbidden before aos_start, which will start core schedule.

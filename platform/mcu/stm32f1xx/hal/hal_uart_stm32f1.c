@@ -118,8 +118,8 @@ static UART_MAPPING* GetUARTMapping(const PORT_UART_TYPE port)
 static PORT_UART_TYPE GetAppPortFromPhyInstanse(const void* uartIns)
 {
     PORT_UART_TYPE rc = PORT_UART_INVALID;
-    int8_t i = 0;
-    for(i; i<PORT_UART_SIZE; i++)
+    int8_t i;
+    for(i = 0; i<PORT_UART_SIZE; i++)
     {
         if( (USART_TypeDef*)UART_MAPPING_TABLE[i].uartPhyP == (USART_TypeDef*)uartIns)
         {
@@ -198,7 +198,7 @@ int32_t hal_uart_init(uart_dev_t *uart)
     }
 
     //no found this port in function-physical uartIns, no need initialization
-    uartIns = GetUARTMapping(uart->port);
+    uartIns = GetUARTMapping((PORT_UART_TYPE)uart->port);
     if( NULL== uartIns ) {
         return -1;
     }
@@ -223,7 +223,7 @@ int32_t hal_uart_init(uart_dev_t *uart)
     }
 
     if (NULL == stm32_uart[uart->port].UartRxBuf) {
-        printf("Fail to malloc memory size %d at %s %d \r\d", uartIns->attr.max_buf_bytes, __FILE__, __LINE__);
+        printf("Fail to malloc memory size %d at %s %d \r\n", uartIns->attr.max_buf_bytes, __FILE__, __LINE__);
         return -1;
     }
     memset(stm32_uart[uart->port].UartRxBuf, 0, uartIns->attr.max_buf_bytes);
@@ -251,11 +251,11 @@ int32_t hal_uart_init(uart_dev_t *uart)
      * otherwise in DMA mode
      */
     if(pstuarthandle->hdmarx == NULL) {
-        ret = uart_receive_start_it(uart->port,uartIns->attr.max_buf_bytes);
+        ret = uart_receive_start_it((PORT_UART_TYPE)uart->port,uartIns->attr.max_buf_bytes);
     }
     else {
         //init uart dma receive
-        ret = uart_receive_start_dma(uart->port,uartIns->attr.max_buf_bytes);
+        ret = uart_receive_start_dma((PORT_UART_TYPE)uart->port,uartIns->attr.max_buf_bytes);
     }
 
     if (ret) {
@@ -287,7 +287,7 @@ static int32_t uart_receive_start_it(PORT_UART_TYPE uart_port, uint32_t max_buff
 static int32_t uart_receive_start_dma(PORT_UART_TYPE uart_port, uint32_t max_buffer_size)
 {
     UART_HandleTypeDef *pstuarthandle = NULL;
-    uint32_t temp_reg;
+    /*uint32_t temp_reg;*/
 
     pstuarthandle = &stm32_uart[uart_port].hal_uart_handle;
 
@@ -317,7 +317,7 @@ int32_t hal_uart_send(uart_dev_t *uart, const void *data, uint32_t size, uint32_
         return -1;
     }
 
-    uartIns = GetUARTMapping(uart->port);
+    uartIns = GetUARTMapping((PORT_UART_TYPE)uart->port);
     if( NULL== uartIns ) {
         return -1;
     }
@@ -335,10 +335,10 @@ int32_t hal_uart_send(uart_dev_t *uart, const void *data, uint32_t size, uint32_
      * otherwise in DMA mode
      */
     if(handle->hdmatx ==NULL) {
-        ret = uart_send_it(uart->port,data, size, timeout);
+        ret = uart_send_it((PORT_UART_TYPE)uart->port,data, size, timeout);
     }
     else {
-        ret = uart_send_dma(uart->port,data, size, timeout);
+        ret = uart_send_dma((PORT_UART_TYPE)uart->port,data, size, timeout);
     }
 
     return ret;
@@ -383,13 +383,13 @@ int32_t hal_uart_recv_II(uart_dev_t *uart, void *data, uint32_t expect_size,
         return -1;
     }
 
-    uartIns = GetUARTMapping(uart->port);
+    uartIns = GetUARTMapping((PORT_UART_TYPE)uart->port);
     if(NULL== uartIns) {
         return -1;
     }
 
     if (aos_mutex_lock(&stm32_uart[uart->port].uart_rx_mutex, timeout)) {
-        printf("uart port % recv fail to get mutex \r\n", uart->port);
+        printf("uart port %d recv fail to get mutex \r\n", uart->port);
         return -1;
     }
 
@@ -411,7 +411,7 @@ static int32_t uart_receive_it(uart_dev_t *uart, void *data, uint32_t expect_siz
     uint32_t rx_count = 0;
     int32_t ret = -1;
 
-    UART_MAPPING* uartIns = GetUARTMapping(uart->port);
+    UART_MAPPING* uartIns = GetUARTMapping((PORT_UART_TYPE)uart->port);
 
     while (rx_count < expect_size)
     {
@@ -481,7 +481,7 @@ static int32_t uart_receive_dma(uart_dev_t *uart, void *data, uint32_t expect_si
     uint32_t cr1its = 0;
     uint32_t dmaisr = 0;
 
-    UART_MAPPING* uartIns = GetUARTMapping(uart->port);
+    UART_MAPPING* uartIns = GetUARTMapping((PORT_UART_TYPE)uart->port);
 
     while (rx_count < expect_size)
     {
@@ -581,7 +581,7 @@ int32_t hal_uart_finalize(uart_dev_t *uart)
         return -1;
     }
 
-    uartIns = GetUARTMapping(uart->port);
+    uartIns = GetUARTMapping((PORT_UART_TYPE)uart->port);
     if( NULL== uartIns ){
         return -1;
     }
